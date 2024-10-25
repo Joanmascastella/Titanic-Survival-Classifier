@@ -19,7 +19,7 @@ def main(train_file, test_file, submission_file, device):
 
     # Clean & Process Data
     print("2. Cleaning & Processing Data")
-    train_cleaned, test_cleaned = d.clean_data(train, test)
+    train_cleaned, test_cleaned, y_train = d.clean_data(train, test)
     train_processed, test_processed = d.process_data(train_cleaned, test_cleaned)
 
 
