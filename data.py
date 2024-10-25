@@ -20,23 +20,22 @@ def clean_data(train, test):
 
     return x_train, x_test, y_train
 
-
 def process_data(train_cleaned, test_cleaned):
     x_train = train_cleaned
     x_test = test_cleaned
-    # Convert Survival, PClass, Sex, Embarked To Binary Values
 
     # Convert 'Sex' to binary values
     le_sex = LabelEncoder()
     x_train['Sex'] = le_sex.fit_transform(x_train['Sex'])
     x_test['Sex'] = le_sex.transform(x_test['Sex'])
 
-    # Convert 'Embarked' to binary values with one-hot encoding
-    x_train = pd.get_dummies(x_train, columns=['Embarked'], drop_first=True)
-    x_test = pd.get_dummies(x_test, columns=['Embarked'], drop_first=True)
+    # Convert 'Embarked' to binary values with one-hot encoding, keeping all categories
+    x_train = pd.get_dummies(x_train, columns=['Embarked'], drop_first=False)  # Set drop_first=False
+    x_test = pd.get_dummies(x_test, columns=['Embarked'], drop_first=False)    # Set drop_first=False
 
     # Align columns in case they differ after encoding
-    x_train, x_test = x_train.align(x_test, join='left', axis=1, fill_value=0)
+    # Use 'outer' to include all categories
+    x_train, x_test = x_train.align(x_test, join='outer', axis=1, fill_value=0)
 
     # Normalize 'Age' and 'Fare' columns
     scaler = StandardScaler()
