@@ -9,12 +9,13 @@ import feature_extractor as ft
 import model_complier as mc
 import helpful_functions as hf
 
-def main(train_file, test_file, submission_file):
+def main(train_file, test_file, submission_file, device):
     # Save File Contents
     print("1. Loading & Saving Data To Data Frames")
     train = pd.read_csv(train_file)
     test = pd.read_csv(test_file)
     submission = pd.read_csv(submission_file)
+    device = device
 
     # Clean & Process Data
     print("2. Cleaning & Processing Data")
@@ -28,4 +29,5 @@ if __name__ == '__main__':
     train_file = "./data/train.csv"
     test_file = "./data/test.csv"
     submission_file = "./data/gender_submission.csv"
-    main(train_file, test_file, submission_file)
+    device  = hf.get_device()
+    main(train_file, test_file, submission_file, device)
