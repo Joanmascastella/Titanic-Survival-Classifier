@@ -10,6 +10,7 @@ import model_complier as mc
 import helpful_functions as hf
 
 def main(train_file, test_file, submission_file, device):
+
     # Save File Contents
     print("1. Loading & Saving Data To Data Frames")
     train = pd.read_csv(train_file)
@@ -21,6 +22,18 @@ def main(train_file, test_file, submission_file, device):
     print("2. Cleaning & Processing Data")
     train_cleaned, test_cleaned, y_train = d.clean_data(train, test)
     train_processed, test_processed = d.process_data(train_cleaned, test_cleaned)
+    train_loader, test_loader = d.create_data_loaders(train_processed, test_processed, y_train)
+
+    # Extract Features
+    print("3. Extracting Features Using Auto Encoder")
+    input_size = train_processed.shape[1]  # Number of input features
+    hidden_size = 40
+    learning_rate = 0.001
+    num_epochs = 120
+
+    # Extract features using the autoencoder
+    train_features, test_features = ft.extract_features(train_loader, test_loader, input_size, hidden_size, device, learning_rate, num_epochs)
+
 
 
 

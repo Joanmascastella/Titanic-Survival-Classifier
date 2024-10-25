@@ -1,5 +1,7 @@
 import pandas as pd
+import torch
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from torch.utils.data import TensorDataset, DataLoader
 
 
 def clean_data(train, test):
@@ -47,3 +49,27 @@ def process_data(train_cleaned, test_cleaned):
     print(f"X_Test Structure after encoding and normalization: \n{x_test.head()}")
 
     return x_train, x_test
+
+def create_data_loaders(train_processed, test_processed, y_train, batch_size=32):
+    # Ensure all data is numeric and handle NaN values
+    train_processed = train_processed.apply(pd.to_numeric, errors='coerce').fillna(0)
+    test_processed = test_processed.apply(pd.to_numeric, errors='coerce').fillna(0)
+    y_train = pd.to_numeric(y_train, errors='coerce').fillna(0)  # Handle NaNs in labels as well
+
+    # Convert boolean columns to integers (0 or 1)
+    train_processed = train_processed.astype(int)
+    test_processed = test_processed.astype(int)
+
+    # Create tensors
+    train_tensor = torch.tensor(train_processed.values).float()  # Convert to float tensor
+    y_train_tensor = torch.tensor(y_train.values).float()  # Labels as tensor
+    test_tensor = torch.tensor(test_processed.values).float()
+
+    # Create TensorDataset and DataLoader
+    train_dataset = TensorDataset(train_tensor, y_train_tensor)
+    test_dataset = TensorDataset(test_tensor)  # Test dataset does not have labels
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+    return train_loader, test_loader
