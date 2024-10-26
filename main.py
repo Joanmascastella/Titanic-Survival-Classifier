@@ -34,7 +34,9 @@ def main(train_file, test_file, submission_file, device):
     num_epochs = 120
 
     # Extract features using the autoencoder
-    train_features, test_features = ft.extract_features(train_loader, test_loader, input_size, hidden_size, device, learning_rate, num_epochs)
+    train_features, test_features = ft.extract_features(train_loader, test_loader,
+                                                        input_size, hidden_size, device,
+                                                        learning_rate, num_epochs)
 
 
     print("4. Compiling Models")
@@ -51,10 +53,13 @@ def main(train_file, test_file, submission_file, device):
 
     print("5. Training the Model")
     # Training SVM
-    s_accuracy_list, s_loss_list = t.svm_train(s_mmodel, s_optimizer, s_criterion, s_loss_list, s_accuracy_list, s_n_epochs, train_features, test_features)
+    s_accuracy_list, s_loss_list = t.svm_train(s_mmodel, s_optimizer, s_criterion,
+                                               s_loss_list, s_accuracy_list, s_n_epochs,
+                                               train_features, test_features)
 
     # Training KNN
-    k_accuracy_list, k_loss_list = t.knn_train(knnmodel, k_loss_list, k_accuracy_list, k_n_epochs, train_features, test_features)
+    k_accuracy_list, k_loss_list = t.knn_train(knnmodel, k_loss_list, k_accuracy_list, k_n_epochs,
+                                               train_features, test_features)
 
 
     print("6. Comparing Results")

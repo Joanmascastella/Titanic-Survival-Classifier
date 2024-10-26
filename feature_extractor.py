@@ -2,7 +2,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
+
 import helpful_functions as hf
+
 
 # Define the Autoencoder Model
 class Autoencoder(nn.Module):
@@ -31,7 +33,9 @@ class Autoencoder(nn.Module):
         reconstructed = self.decoder(latent_space)
         return reconstructed, latent_space
 
-def extract_features(train_loader, test_loader, input_size, hidden_size, device, learning_rate, num_epochs):
+
+def extract_features(train_loader, test_loader, input_size,
+                     hidden_size, device, learning_rate, num_epochs):
     # Creating Autoencoder
     autoencoder = Autoencoder(input_size, hidden_size).to(device)
 
