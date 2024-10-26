@@ -1,15 +1,14 @@
 # Import libraries
-import torch
 import pandas as pd
-from torch.utils.data import TensorDataset, DataLoader
 
 # Import other classes
 import data as d
 import feature_extractor as ft
-import model_complier as mc
 import helpful_functions as hf
+import model_complier as mc
 import model_params as mp
 import train as t
+
 
 def main(train_file, test_file, submission_file, device):
 
