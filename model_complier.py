@@ -1,8 +1,5 @@
 import torch
 import torch.nn as nn
-import helpful_functions as hf
-
-device = hf.get_device()
 
 # SVM Classifier
 class SVMClassifier(nn.Module):
@@ -17,7 +14,6 @@ class SVMClassifier(nn.Module):
         x = torch.relu(self.fc2(x))
         x = self.fc3(x)
         return torch.sigmoid(x)
-
 
 # K-Nearest Neighbours Classifier
 class KNNClassifier:

@@ -44,9 +44,10 @@ def main(train_file, test_file, submission_file, device):
 
     # Compile K-Nearest Neighbours Model
     k_nearest_model = mc.KNNClassifier()
-    model, optimizer, criterion, loss_list, accuracy_list, n_epochs = mp.define_knn_params(k_nearest_model)
+    model, loss_list, accuracy_list, n_epochs = mp.define_knn_params(k_nearest_model)
 
     print("5. Training the Model")
+
 
 
 
