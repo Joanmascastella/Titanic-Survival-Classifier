@@ -9,6 +9,7 @@ import feature_extractor as ft
 import model_complier as mc
 import helpful_functions as hf
 import model_params as mp
+import train as t
 
 def main(train_file, test_file, submission_file, device):
 
@@ -18,6 +19,7 @@ def main(train_file, test_file, submission_file, device):
     test = pd.read_csv(test_file)
     submission = pd.read_csv(submission_file)
     device = device
+
 
     # Clean & Process Data
     print("2. Cleaning & Processing Data")
@@ -40,15 +42,20 @@ def main(train_file, test_file, submission_file, device):
     # Compile SVM Classifier Model
     input_size = train_features.shape[1]
     svm_model = mc.SVMClassifier(input_size)
-    model, optimizer, criterion, loss_list, accuracy_list, n_epochs = mp.define_svm_params(svm_model)
+    s_mmodel, s_optimizer, s_criterion, s_loss_list, s_accuracy_list, s_n_epochs = mp.define_svm_params(svm_model)
 
     # Compile K-Nearest Neighbours Model
     k_nearest_model = mc.KNNClassifier()
-    model, loss_list, accuracy_list, n_epochs = mp.define_knn_params(k_nearest_model)
+    knnmodel, k_loss_list, k_accuracy_list, k_n_epochs = mp.define_knn_params(k_nearest_model)
+
+
 
     print("5. Training the Model")
+    # Training SVM
+    s_accuracy_list, s_loss_list = t.svm_train(s_mmodel, s_optimizer, s_criterion, s_loss_list, s_accuracy_list, s_n_epochs, train_features, test_features)
 
-
+    # Training KNN
+    k_accuracy_list, k_loss_list = t.knn_train(knnmodel, k_loss_list, k_accuracy_list, k_n_epochs, train_features, test_features)
 
 
     print("6. Comparing Results")
