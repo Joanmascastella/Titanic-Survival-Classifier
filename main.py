@@ -8,6 +8,7 @@ import data as d
 import feature_extractor as ft
 import model_complier as mc
 import helpful_functions as hf
+import model_params as mp
 
 def main(train_file, test_file, submission_file, device):
 
@@ -34,6 +35,22 @@ def main(train_file, test_file, submission_file, device):
     # Extract features using the autoencoder
     train_features, test_features = ft.extract_features(train_loader, test_loader, input_size, hidden_size, device, learning_rate, num_epochs)
 
+
+    print("4. Compiling Models")
+    # Compile SVM Classifier Model
+    input_size = train_features.shape[1]
+    svm_model = mc.SVMClassifier(input_size)
+    model, optimizer, criterion, loss_list, accuracy_list, n_epochs = mp.define_svm_params(svm_model)
+
+    # Compile K-Nearest Neighbours Model
+    k_nearest_model = mc.KNNClassifier()
+    model, optimizer, criterion, loss_list, accuracy_list, n_epochs = mp.define_knn_params(k_nearest_model)
+
+    print("5. Training the Model")
+
+
+
+    print("6. Comparing Results")
 
 
 
