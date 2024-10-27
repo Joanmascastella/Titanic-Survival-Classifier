@@ -1,5 +1,7 @@
 # Import libraries
 import pandas as pd
+import torch
+from torch.utils.data import TensorDataset, DataLoader
 
 # Import other classes
 import data as d
@@ -48,19 +50,30 @@ def main(train_file, test_file, submission_file, device):
     k_nearest_model = mc.KNNClassifier()
     knnmodel, k_loss_list, k_accuracy_list, k_n_epochs = mp.define_knn_params(k_nearest_model)
 
+    print("5. Converting Train And Test Features To Tensors And Then To Data Loader Objects")
+    # Converting To Tensors
+    train_x_tensor = torch.tensor(train_features, dtype=torch.float).to(device)
+    train_y_tensor = torch.tensor(y_train, dtype=torch.float).to(device)
+    test_x_tensor = torch.tensor(test_features, dtype=torch.float).to(device)
 
-    print("5. Training the Model")
+    # Creating DataLoader Objects
+    train_dataset = TensorDataset(train_x_tensor, train_y_tensor)  # Create TensorDataset for train
+    test_dataset = TensorDataset(test_x_tensor)  # Create TensorDataset for test
+
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+
+    print("6. Training the Model")
     # Training SVM
     s_accuracy_list, s_loss_list = t.svm_train(s_mmodel, s_optimizer, s_criterion,
                                                s_loss_list, s_accuracy_list, s_n_epochs,
-                                               train_features, test_features, submission)
+                                               train_loader, test_loader, submission)
 
     # Training KNN
     k_accuracy_list, k_loss_list = t.knn_train(knnmodel, k_loss_list, k_accuracy_list, k_n_epochs,
-                                               train_features, test_features, submission)
+                                               train_loader, test_loader, submission)
 
-
-    print("6. Comparing Results")
+    print("7. Comparing Results")
     print(f" SVM Accuracy: {s_accuracy_list[-1] * 100:.2f}% \n")
     # add plot
     print(f" SVM Loss: {s_loss_list[-1] * 100:.2f}% \n")

@@ -51,5 +51,5 @@ def svm_train(model, optimizer, criterion, loss_list,
 
 
 def knn_train(model, loss_list, accuracy_list, n_epochs,
-              train_features, test_features, submission):
+              train_loader, test_loader, submission):
     return
