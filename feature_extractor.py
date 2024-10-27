@@ -11,20 +11,24 @@ class Autoencoder(nn.Module):
     def __init__(self, input_size, hidden_size):
         super(Autoencoder, self).__init__()
 
-        # Encoder
+        # Encoder with an extra layer and dropout
         self.encoder = nn.Sequential(
-            nn.Linear(input_size, 128),
-            nn.BatchNorm1d(128),  # Add Batch Normalization
+            nn.Linear(input_size, 256),
+            nn.BatchNorm1d(256),
             nn.ReLU(),
-            nn.Linear(128, hidden_size)  # Latent space
+            nn.Dropout(0.3),
+            nn.Linear(256, hidden_size),
+            nn.BatchNorm1d(hidden_size),
+            nn.ReLU()
         )
 
-        # Decoder
+        # Decoder with an extra layer and dropout
         self.decoder = nn.Sequential(
-            nn.Linear(hidden_size, 128),
-            nn.BatchNorm1d(128),  # Add Batch Normalization
+            nn.Linear(hidden_size, 256),
+            nn.BatchNorm1d(256),
             nn.ReLU(),
-            nn.Linear(128, input_size),
+            nn.Dropout(0.3),
+            nn.Linear(256, input_size),
             nn.Sigmoid()
         )
 
@@ -40,7 +44,7 @@ def extract_features(train_loader, test_loader, input_size,
     autoencoder = Autoencoder(input_size, hidden_size).to(device)
 
     # Define loss function and optimizer with weight decay (L2 regularization)
-    criterion = nn.MSELoss()
+    criterion = nn.L1Loss()
     optimizer = optim.Adam(autoencoder.parameters(), lr=learning_rate, weight_decay=1e-5)  # Apply L2 regularization
 
     # Learning rate scheduler (exponential decay)
