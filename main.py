@@ -38,7 +38,6 @@ def main(train_file, test_file, submission_file, device):
                                                         input_size, hidden_size, device,
                                                         learning_rate, num_epochs)
 
-
     print("4. Compiling Models")
     # Compile SVM Classifier Model
     input_size = train_features.shape[1]
@@ -48,7 +47,6 @@ def main(train_file, test_file, submission_file, device):
     # Compile K-Nearest Neighbours Model
     k_nearest_model = mc.KNNClassifier()
     knnmodel, k_loss_list, k_accuracy_list, k_n_epochs = mp.define_knn_params(k_nearest_model)
-
 
 
     print("5. Training the Model")
