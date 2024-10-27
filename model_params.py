@@ -4,7 +4,7 @@ import torch.nn as nn
 def define_svm_params(svm_model):
 
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.SGD(svm_model.parameters(), lr=0.1, momentum=0.9)
+    optimizer = torch.optim.Adam(svm_model.parameters(), lr=0.01)
     loss_list = []
     accuracy_list = []
     n_epochs = 100
