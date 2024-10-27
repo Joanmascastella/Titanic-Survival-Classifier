@@ -43,7 +43,7 @@ def main(train_file, test_file, submission_file, device):
     print("4. Compiling Models")
     # Compile SVM Classifier Model
     input_size = train_features.shape[1]
-    svm_model = mc.SVMClassifier(input_size)
+    svm_model = mc.SVMClassifier(input_size).to(device)
     s_mmodel, s_optimizer, s_criterion, s_loss_list, s_accuracy_list, s_n_epochs = mp.define_svm_params(svm_model)
 
     # Compile K-Nearest Neighbours Model
@@ -52,9 +52,9 @@ def main(train_file, test_file, submission_file, device):
 
     print("5. Converting Train And Test Features To Tensors And Then To Data Loader Objects")
     # Converting To Tensors
-    train_x_tensor = torch.tensor(train_features, dtype=torch.float).to(device)
-    train_y_tensor = torch.tensor(y_train, dtype=torch.float).to(device)
-    test_x_tensor = torch.tensor(test_features, dtype=torch.float).to(device)
+    train_x_tensor = train_features.clone().detach()  # Use clone().detach() to avoid warning
+    train_y_tensor = torch.tensor(y_train, dtype=torch.float).to(device).unsqueeze(1)
+    test_x_tensor = test_features.clone().detach()
 
     # Creating DataLoader Objects
     train_dataset = TensorDataset(train_x_tensor, train_y_tensor)  # Create TensorDataset for train
