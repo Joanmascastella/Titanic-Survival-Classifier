@@ -44,7 +44,8 @@ def main(train_file, test_file, submission_file, device):
     # Compile SVM Classifier Model
     input_size = train_features.shape[1]
     svm_model = mc.SVMClassifier(input_size).to(device)
-    s_mmodel, s_optimizer, s_criterion, s_loss_list, s_accuracy_list, s_n_epochs = mp.define_svm_params(svm_model)
+    s_mmodel, s_optimizer, s_criterion, s_scheduler, s_loss_list, s_accuracy_list, s_n_epochs = mp.define_svm_params(
+        svm_model)
 
     # Compile K-Nearest Neighbours Model
     k_nearest_model = mc.KNNClassifier()
@@ -65,7 +66,7 @@ def main(train_file, test_file, submission_file, device):
 
     print("6. Training the Model")
     # Training SVM
-    s_accuracy_list, s_loss_list = t.svm_train(s_mmodel, s_optimizer, s_criterion,
+    s_accuracy_list, s_loss_list = t.svm_train(s_mmodel, s_optimizer, s_criterion, s_scheduler,
                                                s_loss_list, s_accuracy_list, s_n_epochs,
                                                train_loader, test_loader, submission)
 

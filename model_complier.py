@@ -5,14 +5,15 @@ import torch.nn as nn
 class SVMClassifier(nn.Module):
     def __init__(self, input_size):
         super(SVMClassifier, self).__init__()
-        self.fc1 = nn.Linear(input_size, 16)  # Hidden layer
-        self.fc2 = nn.Linear(16, 1)  # Single output for binary classification
+        self.fc1 = nn.Linear(input_size, 32)
+        self.bn1 = nn.BatchNorm1d(32)
+        self.fc2 = nn.Linear(32, 1)  # Two outputs for CrossEntropyLoss
 
     def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = self.fc2(x)  # Output logits
+        x = torch.relu(self.bn1(self.fc1(x)))
+        x = torch.dropout(x, p=0.5, train=self.training)
+        x = self.fc2(x)  # Two output logits for each class
         return x
-
 
 # K-Nearest Neighbours Classifier
 class KNNClassifier:
@@ -40,6 +41,6 @@ class KNNClassifier:
         # Gather labels of these k closest samples
         nearest_labels = self.y_train[indices]
 
-        # Determine the most common label among the nearest neighbors
-        predictions = torch.mode(nearest_labels, dim=1).values
+        # Perform mode calculation on the CPU
+        predictions = torch.mode(nearest_labels.cpu(), dim=1).values.to(X_test.device)  # Move back to MPS if needed
         return predictions
