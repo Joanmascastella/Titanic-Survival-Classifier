@@ -12,20 +12,20 @@ def clean_data(train, test):
 
     # Drop irrelevant columns
     y_train = train['Survived']
-    x_train = train.drop(['PassengerId', 'Survived', 'Name', 'Ticket'], axis=1)
-    x_test = test.drop(['PassengerId', 'Name', 'Ticket'], axis=1)
+    x_train = train.drop(['PassengerId', 'Survived', 'Name', 'Ticket', 'Cabin', 'Embarked'], axis=1)
+    x_test = test.drop(['PassengerId', 'Name', 'Ticket', 'Cabin', 'Embarked'], axis=1)
 
-    # Optionally process Cabin to extract deck letter (e.g., C, D, etc.)
-    for dataset in [x_train, x_test]:
-        dataset['Deck'] = dataset['Cabin'].str[0]  # Extract the first letter
-        dataset.drop('Cabin', axis=1, inplace=True)  # Drop original Cabin column
+    # # Optionally process Cabin to extract deck letter (e.g., C, D, etc.)
+    # for dataset in [x_train, x_test]:
+    #     dataset['Deck'] = dataset['Cabin'].str[0]  # Extract the first letter
+    #     dataset.drop('Cabin', axis=1, inplace=True)  # Drop original Cabin column
 
     # Handle missing values: Fill Age with median and drop rows with missing Embarked
     x_train.loc[:, 'Age'] = x_train['Age'].fillna(x_train['Age'].median())
     x_test.loc[:, 'Age'] = x_test['Age'].fillna(x_test['Age'].median())
 
-    # Fill missing values for Embarked in test data with mode of training data
-    x_test.loc[:, 'Embarked'] = x_test['Embarked'].fillna(x_train['Embarked'].mode()[0])
+    # # Fill missing values for Embarked in test data with mode of training data
+    # x_test.loc[:, 'Embarked'] = x_test['Embarked'].fillna(x_train['Embarked'].mode()[0])
 
     return x_train, x_test, y_train
 
@@ -37,12 +37,12 @@ def process_data(train_cleaned, test_cleaned):
     x_train['Sex'] = le_sex.fit_transform(x_train['Sex'])
     x_test['Sex'] = le_sex.transform(x_test['Sex'])
 
-    # One-hot encode Embarked and Deck
-    x_train = pd.get_dummies(x_train, columns=['Embarked', 'Deck'], drop_first=False)
-    x_test = pd.get_dummies(x_test, columns=['Embarked', 'Deck'], drop_first=False)
-
-    # Align columns in case of mismatch
-    x_train, x_test = x_train.align(x_test, join='outer', axis=1, fill_value=0)
+    # # One-hot encode Embarked and Deck
+    # x_train = pd.get_dummies(x_train, columns=['Embarked', 'Deck'], drop_first=False)
+    # x_test = pd.get_dummies(x_test, columns=['Embarked', 'Deck'], drop_first=False)
+    #
+    # # Align columns in case of mismatch
+    # x_train, x_test = x_train.align(x_test, join='outer', axis=1, fill_value=0)
 
     # Normalize Age and Fare
     scaler = StandardScaler()
