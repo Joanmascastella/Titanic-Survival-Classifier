@@ -24,21 +24,9 @@ def main(train_file, test_file, submission_file, device):
     # Clean & Process Data
     print("2. Cleaning & Processing Data")
     train, test, y_train = d.clean_and_process_data(train, test)
-    train_loader, test_loader = d.create_data_loaders(train, y_train, test)
+    train_loader, val_loader = d.create_data_loaders(train, y_train)
 
-    # # # Extract Features
-    # # print("3. Extracting Features Using Auto Encoder")
-    # input_size = train_loader.shape[1]  # Number of input features
-    # # hidden_size = 40
-    # # learning_rate = 0.001
-    # # num_epochs = 120
-    #
-    # # Extract features using the autoencoder
-    # train_features, test_features = ft.extract_features(train_loader, test_loader,
-    #                                                     input_size, hidden_size, device,
-    #                                                     learning_rate, num_epochs)
-
-    print("4. Compiling Models")
+    print("3. Compiling Models")
     # Compile SVM Classifier Model
     input_size = train.shape[1]
     svm_model = mc.SVMClassifier(input_size).to(device)
@@ -49,7 +37,7 @@ def main(train_file, test_file, submission_file, device):
     k_nearest_model = mc.KNNClassifier()
     knnmodel, k_loss_list, k_accuracy_list, k_n_epochs = mp.define_knn_params(k_nearest_model)
 
-    print("5. Converting Train And Test Features To Tensors And Then To Data Loader Objects")
+    print("4. Converting Train And Test Features To Tensors And Then To Data Loader Objects")
 
     # Convert train, test, and labels to PyTorch tensors
     train_x_tensor = torch.tensor(train.values, dtype=torch.float32).to(device)
@@ -62,15 +50,16 @@ def main(train_file, test_file, submission_file, device):
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
-    print("6. Training the Model")
+    print("5. Training the Model")
     # Training SVM
-    t.svm_train(s_mmodel, s_optimizer, s_criterion, s_scheduler,
-                                               s_loss_list, s_accuracy_list, s_n_epochs,
-                                               train_loader, test_loader, submission)
+    t.svm_train(s_mmodel, s_optimizer, s_criterion, s_scheduler, s_loss_list, s_accuracy_list, s_n_epochs,
+                train_loader, val_loader, test_loader, submission)
 
     # Training KNN
     t.knn_train(knnmodel, k_loss_list, k_accuracy_list, k_n_epochs,
                                                train_loader, test_loader, submission)
+
+    print("6. Training loops done. \n Predictions have been moved to the models respective submission files.")
 
 if __name__ == '__main__':
     # Load Data

@@ -4,11 +4,15 @@ import helpful_functions as hf
 
 device = hf.get_device()
 
-def svm_train(model, optimizer, criterion, scheduler, loss_list,
-              accuracy_list, n_epochs, train_loader,
+
+def svm_train(model, optimizer, criterion, scheduler, loss_list, accuracy_list, n_epochs, train_loader, val_loader,
               test_loader, submission):
+    device = next(model.parameters()).device
+
+    # Training function with validation evaluation
     def train(n_epochs):
         for epoch in range(n_epochs):
+            # Training loop
             model.train()
             running_loss = 0.0
             correct_predictions = 0
@@ -25,25 +29,54 @@ def svm_train(model, optimizer, criterion, scheduler, loss_list,
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-                scheduler.step()  # Update learning rate
 
                 running_loss += loss.item()
 
-                # Apply a threshold to logits for binary prediction (e.g., 0.5 if using BCEWithLogitsLoss)
+                # Apply a threshold to logits for binary prediction
                 predicted_labels = (torch.sigmoid(y_pred) > 0.5).float()
                 correct_predictions += (predicted_labels == y).sum().item()
                 total_predictions += y.size(0)
 
+            # Compute training loss and accuracy for the epoch
             epoch_loss = running_loss / len(train_loader)
-            epoch_accuracy = correct_predictions / total_predictions * 100  # Percentage
+            epoch_accuracy = correct_predictions / total_predictions * 100
 
             loss_list.append(epoch_loss)
             accuracy_list.append(epoch_accuracy)
 
-            print(f"Epoch [{epoch + 1}/{n_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%")
+            # Validation loop
+            model.eval()
+            val_loss = 0.0
+            val_correct = 0
+            val_total = 0
+            with torch.no_grad():
+                for x_val, y_val in val_loader:
+                    x_val, y_val = x_val.to(device), y_val.to(device)
 
+                    val_pred = model(x_val)
+                    val_loss += criterion(val_pred, y_val).item()
+
+                    # Apply threshold for binary classification
+                    val_pred_labels = (torch.sigmoid(val_pred) > 0.5).float()
+                    val_correct += (val_pred_labels == y_val).sum().item()
+                    val_total += y_val.size(0)
+
+            # Compute validation loss and accuracy for the epoch
+            val_epoch_loss = val_loss / len(val_loader)
+            val_epoch_accuracy = val_correct / val_total * 100
+
+            # Scheduler step based on validation loss
+            scheduler.step(val_epoch_loss)
+
+            # Print epoch metrics
+            print(f"Epoch [{epoch + 1}/{n_epochs}], "
+                  f"Train Loss: {epoch_loss:.4f}, Train Accuracy: {epoch_accuracy:.2f}%, "
+                  f"Val Loss: {val_epoch_loss:.4f}, Val Accuracy: {val_epoch_accuracy:.2f}%")
+
+    # Run training with validation
     train(n_epochs)
 
+    # Inference on test set
     model.eval()
     predictions = []
     with torch.no_grad():
