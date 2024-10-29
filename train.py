@@ -54,8 +54,14 @@ def knn_train(model, loss_list, accuracy_list, n_epochs, train_loader, test_load
         running_loss = 0
 
         for train_batch, labels in train_loader:
+            # Move data to the specified device
+            train_batch, labels = train_batch.to(device), labels.to(device)
+
             model.fit(train_batch, labels)  # Fit model to training batch
             predictions = model.predict(train_batch)  # Predict on training batch
+
+            # Move predictions to device if not already there
+            predictions = predictions.to(device)
 
             loss = torch.mean((predictions - labels) ** 2).item()  # Compute MSE loss
             running_loss += loss
