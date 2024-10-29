@@ -50,8 +50,3 @@ To train and evaluate the models, first install the libraries, and then run main
 ```bash
 pip install -r requirements.txt 
 python main.py 
-
-
-
-
-
