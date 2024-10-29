@@ -4,7 +4,6 @@ import helpful_functions as hf
 
 device = hf.get_device()
 
-
 def svm_train(model, optimizer, criterion, scheduler, loss_list,
               accuracy_list, n_epochs, train_loader,
               test_loader, submission):
@@ -44,6 +43,18 @@ def svm_train(model, optimizer, criterion, scheduler, loss_list,
             print(f"Epoch [{epoch + 1}/{n_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%")
 
     train(n_epochs)
+
+    model.eval()
+    predictions = []
+    with torch.no_grad():
+        for x in test_loader:
+            x = x[0].to(device).float()
+            y_pred = model(x).cpu().numpy()
+            predictions.extend((y_pred.flatten() > 0.5).astype(int))
+
+        submission['Survived'] = predictions
+        submission.to_csv('./data/svm_submission.csv', index=False)  # Save the CSV
+
     return loss_list, accuracy_list
 
 
@@ -76,5 +87,16 @@ def knn_train(model, loss_list, accuracy_list, n_epochs, train_loader, test_load
         loss_list.append(epoch_loss)
 
         print(f"Epoch [{epoch + 1}/{n_epochs}], KNN Loss: {epoch_loss:.4f}, KNN Accuracy: {epoch_accuracy:.2f}%")
+
+    # Inference for KNN on test set and save submission file
+    knn_predictions = []
+    with torch.no_grad():
+        for test_batch in test_loader:
+            test_batch = test_batch[0].to(device)
+            batch_predictions = model.predict(test_batch).cpu().numpy()
+            knn_predictions.extend(batch_predictions.flatten().astype(int))
+
+        submission['Survived'] = knn_predictions  # Update the 'Survived' column with predictions
+        submission.to_csv('./data/knn_submission.csv', index=False)  # Save the CSV
 
     return loss_list, accuracy_list
